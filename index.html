@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Parallel Timer</title>
     <link rel="apple-touch-icon" href="image_21.png">
     <link rel="icon" type="image/png" href="image_21.png">
     <style>
         :root {
             --bg: #fff;
-            --main: #333; /* 監督指定の黒 */
+            --main: #333; /* #333固定 */
             --accent: #eee;
-            --radius: 12px; /* 少し小さく */
+            --radius: 12px;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
@@ -23,8 +23,12 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            height: 100vh; /* 一画面固定 */
-            padding: 5px; /* 極限まで削る */
+            min-height: 100vh; /* スクロール可能に */
+            /* ★変更：ノッチ（カメラ）を回避するための上部余白 */
+            padding-top: calc(env(safe-area-inset-top, 20px) + 10px); 
+            padding-left: 10px;
+            padding-right: 10px;
+            padding-bottom: env(safe-area-inset-bottom, 10px);
         }
 
         .fridge-container {
@@ -32,21 +36,19 @@
             max-width: 420px;
             display: flex;
             flex-direction: column;
-            height: 100%;
-            justify-content: space-between; /* 均等配置 */
         }
 
-        /* Timer Card (圧縮) */
+        /* Timer Card (視認性重視で余白調整) */
         .timer-card {
             background: #fafafa;
             border: 2px solid var(--accent);
             border-radius: var(--radius);
-            padding: 8px; /* 圧縮 */
-            flex: 1; /* 親要素の高さを分け合う */
+            padding: 12px; /* 圧縮しすぎない */
             display: flex;
             flex-direction: column;
             justify-content: center;
-            margin-bottom: 5px;
+            /* ★変更：タイマー同士の視認性を確保する余白 */
+            margin-bottom: 12px; 
             transition: all 0.2s;
         }
         .timer-card.running { border-color: var(--main); background: #fff; }
@@ -59,44 +61,44 @@
         }
 
         .display {
-            font-size: 3.5rem; /* 少し小さく */
+            font-size: 3.5rem;
             font-weight: 800;
             font-variant-numeric: tabular-nums;
             text-align: center;
-            margin-bottom: 5px;
+            margin-bottom: 8px; /* わずかに調整 */
             line-height: 1;
         }
 
-        /* Controls (圧縮) */
-        .adder-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 8px; }
+        /* Controls */
+        .adder-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
         .add-btn {
-            background: var(--accent); border: none; padding: 10px 0; /* 圧縮 */
+            background: var(--accent); border: none; padding: 12px 0; /* 圧縮しすぎない */
             border-radius: 8px; font-size: 0.8rem; font-weight: 800; color: var(--main); cursor: pointer;
         }
         .add-btn:active { background: #ccc; }
 
         .action-grid { display: grid; grid-template-columns: 3fr 1fr; gap: 8px; }
         .main-btn {
-            background: var(--main); color: #fff; border: none; padding: 12px; /* 圧縮 */
+            background: var(--main); color: #fff; border: none; padding: 15px; /* 圧縮しすぎない */
             border-radius: 10px; font-size: 1rem; font-weight: 800; cursor: pointer;
         }
         .reset-btn {
             background: #fff; border: 2px solid var(--accent); color: #ccc;
-            padding: 12px; border-radius: 10px; font-weight: 800; cursor: pointer; font-size: 0.7rem;
+            padding: 15px; border-radius: 10px; font-weight: 800; cursor: pointer; font-size: 0.7rem;
         }
 
-        /* Footer (圧縮) */
-        .footer-btns { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 10px 0; }
+        /* Footer (タイマー優先で押し出す) */
+        .footer-btns { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 30px 0 10px; }
         .kofi-btn, .home-btn {
-            display: inline-flex; align-items: center; padding: 10px 18px; /* 圧縮 */
-            border-radius: 12px; font-weight: bold; font-size: 0.8rem; text-decoration: none;
+            display: inline-flex; align-items: center; padding: 12px 20px;
+            border-radius: 15px; font-weight: bold; font-size: 0.85rem; text-decoration: none;
         }
         .kofi-btn { background: var(--main); color: #fff; }
         .home-btn { background: var(--accent); color: var(--main); border: none; }
 
-        footer { font-size: 0.7rem; color: #bbb; text-align: center; padding-bottom: 5px; }
+        footer { font-size: 0.7rem; color: #bbb; text-align: center; padding-bottom: 10px; }
 
-        /* Modal (固定仕様:憲法遵守) */
+        /* Modal (固定仕様:憲法遵守・下部クローズボタン削除) */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { 
             background: #fff; padding: 30px; border-radius: 20px; 
@@ -105,8 +107,7 @@
         }
         .modal-title-row { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; font-size: 1.2rem; font-weight: 800;}
         .instruction-group { margin-bottom: 15px; font-size: 0.95rem; line-height: 1.5; color: #333; }
-        .modal-cls-btn { background: var(--accent); border: none; padding: 12px; width: 100%; border-radius: 12px; font-weight: 800; color: var(--main); cursor: pointer; margin-top: 10px;}
-        .close-icon { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; color: #aaa; cursor: pointer; }
+        .close-icon { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; color: #aaa; cursor: pointer; padding: 5px; } /* パディング足して押しやすく */
 
     </style>
 </head>
@@ -171,9 +172,7 @@
             <p>🤖 <strong>Android (Chrome):</strong></p>
             <p>Tap <strong>Menu (⋮)</strong>, then <strong>Add to home screen</strong>.</p>
         </div>
-
-        <button onclick="document.getElementById('modal').style.display='none'" class="modal-cls-btn">Close</button>
-    </div>
+        </div>
 </div>
 
 <script>
@@ -198,7 +197,7 @@
         gain.connect(audioCtx.destination);
         osc.type = 'sine';
         osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.08, audioCtx.currentTime); // わずかに音量下げ
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime); 
         osc.start();
         osc.stop(audioCtx.currentTime + 0.12);
     }
@@ -257,11 +256,11 @@
 
     function startAlarm(id) {
         let count = 0;
-        beep(); // 即座に1回目の音を出す
+        beep(); 
         timers[id].alarmInt = setInterval(() => {
             beep();
             count++;
-            if (count > 150) stopAlarm(id); // Approx 30s
+            if (count > 150) stopAlarm(id); 
         }, 200);
     }
 
