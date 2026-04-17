@@ -1,22 +1,29 @@
-# Parallel Timer
+# Hash Mixer (Fridge Combo #21)
 
-Part of the Fridge Combo project. A triple-track countdown system designed for high-pressure multitasking.
+A hyper-minimalist hashtag shuffler designed for social media managers and creators to avoid algorithmic shadowbans and keep post engagement fresh.
 
-## 1 Tool / 1 Action
+## Core Philosophy
+- **1 Tool / 1 Action**: Focuses exclusively on shuffling and formatting hashtags.
+- **Privacy First**: No login, no tracking, no ads. Browser-only execution.
+- **Frictionless**: Zero storage. Input, mix, and copy.
 
-Manage three independent timers on a single screen. No typing required—just tap to stack time (+10m, +5m, +1m, +10s) and take control of your kitchen or workstation.
-
-## Philosophy
-* **1 Tool, 1 Action.**
-* **No Login / No Ads / No Tracking**
-* **Browser-only Privacy** (Works on low-spec devices)
+## Features
+- **Smart Extraction**: Automatically detects tags from spaces, commas, or line breaks.
+- **Auto-Hashtag**: Automatically adds the `#` symbol to plain keywords.
+- **Instant Shuffle**: Uses the Fisher-Yates algorithm for high-quality randomization.
+- **Clean Formatting**: Outputs a perfectly spaced single-line string ready for Instagram/X.
 
 ## How to Use
-1. **Set:** Tap the increment buttons to add time.
-2. **Start:** Hit the main button to begin the countdown.
-3. **Control:** Use the same button to Pause, Resume, or Stop the alarm.
-4. **Alert:** High-contrast blinking and audio alerts will trigger when time is up.
+1. **Paste**: Drop your list of hashtags or keywords into the text area.
+2. **Mix & Copy**: Tap the button. The tags are randomized, formatted, and copied to your clipboard instantly.
+3. **Finish**: Close the tab. No data is retained.
 
----
-No login / No tracking / No ads / Browser only Privacy Policy  
-**afrorakda © 2026**
+## Design System
+- **Background**: #fff
+- **Main Accent**: #333
+- **Radius**: 15px (Constitutional Rule)
+- **Compatibility**: Optimized for low-spec mobile and desktop browsers (Safari/Chrome).
+
+## License
+afrorakda © 2026
+No login / No tracking / No ads / Browser only Privacy Policy
