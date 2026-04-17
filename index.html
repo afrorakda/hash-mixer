@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Parallel Timer - Fridge Combo</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>Hash Mixer - Fridge Combo</title>
     <link rel="apple-touch-icon" href="image_21.png">
     <link rel="icon" type="image/png" href="image_21.png">
     <style>
@@ -13,16 +15,16 @@
             --accent: #eee;
             --input-bg: #fafafa;
             --radius: 15px;
+            --placeholder: #bbb;
         }
 
         * { 
             box-sizing: border-box; 
             -webkit-tap-highlight-color: transparent; 
-            margin: 0; 
-            padding: 0; 
         }
-        
+
         body {
+            margin: 0;
             background-color: var(--bg);
             color: var(--main);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -30,16 +32,16 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding: calc(env(safe-area-inset-top, 20px) + 10px) 20px env(safe-area-inset-bottom, 20px);
             -webkit-font-smoothing: antialiased;
         }
 
-        .fridge-container {
-            width: 100%;
-            max-width: 400px;
+        .fridge-container { 
+            width: 100%; 
+            max-width: 400px; 
+            padding: 20px;
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
-            flex-grow: 1;
         }
 
         header {
@@ -49,7 +51,9 @@
             margin-bottom: 20px;
         }
 
-        h1 { font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; }
+        .title-group { text-align: left; }
+        h1 { font-size: 1.8rem; margin: 0; font-weight: 800; letter-spacing: -1px; }
+        .subtitle { color: #999; font-size: 0.8rem; font-weight: 600; }
 
         .hub-link {
             text-decoration: none;
@@ -61,81 +65,88 @@
             border-radius: 10px;
         }
 
-        .timer-card {
+        .input-group { 
+            position: relative; 
+            margin-bottom: 15px; 
+        }
+
+        textarea {
+            width: 100%;
+            height: 250px;
             background: var(--input-bg);
             border: 2px solid var(--accent);
             border-radius: var(--radius);
             padding: 15px;
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 15px;
-            transition: all 0.2s;
-        }
-        .timer-card.running { border-color: var(--main); background: #fff; }
-        .timer-card.alarm { animation: blink 0.5s infinite; border-color: var(--main); }
-
-        @keyframes blink {
-            0% { background-color: #fff; color: var(--main); }
-            50% { background-color: var(--main); color: #fff; }
-            100% { background-color: #fff; color: var(--main); }
-        }
-
-        .display {
-            font-size: 3.5rem;
-            font-weight: 800;
-            font-variant-numeric: tabular-nums;
-            text-align: center;
-            margin-bottom: 12px;
-            line-height: 1;
-        }
-
-        .adder-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
-        .add-btn {
-            background: var(--accent); 
-            border: none; 
-            padding: 12px 0;
-            border-radius: 10px; 
-            font-size: 0.8rem; 
-            font-weight: 800; 
-            color: var(--main); 
-            cursor: pointer;
+            padding-right: 45px;
+            font-size: 16px;
+            color: var(--main);
+            resize: none;
+            outline: none;
             -webkit-appearance: none;
-        }
-
-        .action-grid { display: grid; grid-template-columns: 3fr 1fr; gap: 10px; }
-        .main-btn {
-            background: var(--main); 
-            color: #fff; 
-            border: none; 
-            padding: 18px;
-            border-radius: var(--radius); 
-            font-size: 1.1rem; 
-            font-weight: 800; 
-            cursor: pointer;
-            -webkit-appearance: none;
-            -webkit-text-fill-color: #fff;
+            -webkit-text-fill-color: var(--main);
             opacity: 1 !important;
+            transition: border-color 0.2s;
+            font-weight: 500;
+            line-height: 1.5;
         }
-        .reset-btn {
-            background: #fff; 
-            border: 2px solid var(--accent); 
-            color: #ccc;
-            padding: 18px; 
-            border-radius: var(--radius); 
-            font-weight: 800; 
-            cursor: pointer; 
-            font-size: 0.75rem;
+        textarea:focus { border-color: var(--main); }
+        textarea::placeholder { color: var(--placeholder); -webkit-text-fill-color: var(--placeholder); }
+
+        .clr-btn {
+            position: absolute;
+            right: 12px;
+            top: 15px;
+            width: 28px;
+            height: 28px;
+            background: #ddd;
+            color: #666;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            z-index: 5;
+        }
+        textarea:not(:placeholder-shown) + .clr-btn { display: flex; }
+
+        #statusMessage {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--main);
+            height: 24px;
+            margin-bottom: 10px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .main-btn {
+            width: 100%;
+            background: var(--main);
+            color: #fff;
+            border: none;
+            padding: 20px;
+            border-radius: var(--radius);
+            font-size: 1.1rem;
+            font-weight: 800;
+            cursor: pointer;
             -webkit-appearance: none;
         }
+        .main-btn:active { transform: scale(0.98); }
 
         .footer-btns { 
             margin-top: auto;
+            padding-top: 40px;
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             gap: 12px; 
-            padding: 40px 0 30px; 
+            margin-bottom: 30px; 
         }
+
         .kofi-btn, .home-btn {
             width: 100%;
             max-width: 250px;
@@ -152,80 +163,40 @@
         .home-btn { background: var(--accent); color: var(--main); }
 
         footer { 
+            width: 100%;
+            padding-bottom: 20px;
+            text-align: center;
             font-size: 0.75rem; 
             color: #bbb; 
-            text-align: center; 
-            padding-bottom: 20px;
             font-weight: 600;
-            line-height: 1.6;
+            line-height: 1.6; 
         }
         footer a { color: inherit; text-decoration: underline; }
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { 
-            background: #fff; 
-            padding: 30px; 
-            border-radius: var(--radius); 
-            width: 85%;
-            max-width: 320px; 
-            position: relative;
-            text-align: center;
-        }
-        .close-icon { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; color: #aaa; cursor: pointer; font-weight: bold; }
-
+        .modal-content { background: #fff; padding: 30px; border-radius: var(--radius); width: 85%; max-width: 320px; text-align: center; position: relative; }
+        .close-modal { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; color: #aaa; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="fridge-container">
     <header>
-        <h1>Parallel Timer</h1>
+        <div class="title-group">
+            <h1>Hash Mixer</h1>
+            <p class="subtitle">Shuffle tags to stay under the radar.</p>
+        </div>
         <a href="https://afrorakda.github.io/" class="hub-link">🏠 Hub</a>
     </header>
 
-    <div id="timers-container">
-        <div class="timer-card" id="card-1">
-            <div class="display" id="display-1">00:00</div>
-            <div class="adder-grid">
-                <button class="add-btn" onclick="addTime(1, 600)">+10m</button>
-                <button class="add-btn" onclick="addTime(1, 300)">+5m</button>
-                <button class="add-btn" onclick="addTime(1, 60)">+1m</button>
-                <button class="add-btn" onclick="addTime(1, 10)">+10s</button>
-            </div>
-            <div class="action-grid">
-                <button class="main-btn" id="start-1" onclick="toggleTimer(1)">START</button>
-                <button class="reset-btn" onclick="resetTimer(1)">CLR</button>
-            </div>
-        </div>
-
-        <div class="timer-card" id="card-2">
-            <div class="display" id="display-2">00:00</div>
-            <div class="adder-grid">
-                <button class="add-btn" onclick="addTime(2, 600)">+10m</button>
-                <button class="add-btn" onclick="addTime(2, 300)">+5m</button>
-                <button class="add-btn" onclick="addTime(2, 60)">+1m</button>
-                <button class="add-btn" onclick="addTime(2, 10)">+10s</button>
-            </div>
-            <div class="action-grid">
-                <button class="main-btn" id="start-2" onclick="toggleTimer(2)">START</button>
-                <button class="reset-btn" onclick="resetTimer(2)">CLR</button>
-            </div>
-        </div>
-
-        <div class="timer-card" id="card-3">
-            <div class="display" id="display-3">00:00</div>
-            <div class="adder-grid">
-                <button class="add-btn" onclick="addTime(3, 600)">+10m</button>
-                <button class="add-btn" onclick="addTime(3, 300)">+5m</button>
-                <button class="add-btn" onclick="addTime(3, 60)">+1m</button>
-                <button class="add-btn" onclick="addTime(3, 10)">+10s</button>
-            </div>
-            <div class="action-grid">
-                <button class="main-btn" id="start-3" onclick="toggleTimer(3)">START</button>
-                <button class="reset-btn" onclick="resetTimer(3)">CLR</button>
-            </div>
-        </div>
+    <div class="input-group">
+        <textarea id="input" placeholder="Paste your hashtags here..."></textarea>
+        <button id="clear" class="clr-btn">×</button>
     </div>
+
+    <div id="statusMessage"></div>
+
+    <button class="main-btn" id="mixBtn">Mix & Copy</button>
 
     <div class="footer-btns">
         <a href="https://ko-fi.com/afrorakda" target="_blank" class="kofi-btn">☕️Buy me a coffee</a>
@@ -241,125 +212,59 @@
 
 <div id="modal" class="modal">
     <div class="modal-content">
-        <span class="close-icon" onclick="document.getElementById('modal').style.display='none'">&times;</span>
-        <h3 style="margin-top:0; font-weight:800">📱 Install</h3>
-        <p style="margin: 15px 0; color: #666; font-size: 0.9rem;">Add to your home screen.</p>
-        <div style="text-align: left; font-size: 0.9rem; line-height: 1.6;">
-            <p>🍏 <b>iPhone (Safari):</b><br>Share > Add to Home Screen</p><br>
-            <p>🤖 <b>Android (Chrome):</b><br>Menu (⋮) > Add to home screen</p>
-        </div>
+        <span class="close-modal" id="close">&times;</span>
+        <h3 style="margin-top:0">📱 Install</h3>
+        <p style="font-size:0.9rem; color:#666">Add to home screen.<br><br>🍏 <b>Safari</b>: Share > Add to Home Screen<br>🤖 <b>Chrome</b>: Menu > Add to home screen</p>
     </div>
 </div>
 
 <script>
-    const timers = {
-        1: { time: 0, interval: null, running: false, alarmInt: null },
-        2: { time: 0, interval: null, running: false, alarmInt: null },
-        3: { time: 0, interval: null, running: false, alarmInt: null }
-    };
+    const input = document.getElementById('input');
+    const mixBtn = document.getElementById('mixBtn');
+    const statusMsg = document.getElementById('statusMessage');
+    const clearBtn = document.getElementById('clear');
+    const modal = document.getElementById('modal');
 
-    let audioCtx = null;
+    mixBtn.addEventListener('click', () => {
+        const rawText = input.value.trim();
+        if (!rawText) return;
 
-    function initAudio() {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-    }
+        // ハッシュタグを抽出（スペース、カンマ、改行で分割し、#で始まるものを特定、または全てをタグとして扱う）
+        // 連続する空白なども考慮
+        let tags = rawText.split(/[\s,]+/).filter(t => t.length > 0);
 
-    function beep() {
-        if (!audioCtx) return;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.08, audioCtx.currentTime); 
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.12);
-    }
-
-    function addTime(id, sec) {
-        initAudio();
-        const t = timers[id];
-        if (t.alarmInt) stopAlarm(id);
-        t.time += sec;
-        if (t.time > 5999) t.time = 5999;
-        updateDisplay(id);
-    }
-
-    function updateDisplay(id) {
-        const m = Math.floor(timers[id].time / 60);
-        const s = timers[id].time % 60;
-        document.getElementById(`display-${id}`).textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-    }
-
-    function toggleTimer(id) {
-        initAudio();
-        const t = timers[id];
-        const btn = document.getElementById(`start-${id}`);
-        const card = document.getElementById(`card-${id}`);
-
-        if (t.alarmInt) {
-            stopAlarm(id);
-            return;
+        // フィッシャー–イェーツのシャッフル
+        for (let i = tags.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [tags[i], tags[j]] = [tags[j], tags[i]];
         }
 
-        if (t.running) {
-            clearInterval(t.interval);
-            t.running = false;
-            btn.textContent = 'RESUME';
-            card.classList.remove('running');
-        } else {
-            if (t.time <= 0) return;
-            t.running = true;
-            btn.textContent = 'PAUSE';
-            card.classList.add('running');
+        const processed = tags.join(' ');
+        input.value = processed;
+
+        navigator.clipboard.writeText(processed).then(() => {
+            statusMsg.textContent = `✨ ${tags.length} tags shuffled & Copied!`;
+            statusMsg.style.opacity = '1';
             
-            t.interval = setInterval(() => {
-                t.time--;
-                updateDisplay(id);
-                if (t.time <= 0) {
-                    clearInterval(t.interval);
-                    t.running = false;
-                    btn.textContent = 'STOP';
-                    card.classList.remove('running');
-                    card.classList.add('alarm');
-                    startAlarm(id);
-                }
-            }, 1000);
-        }
-    }
+            const originalText = mixBtn.textContent;
+            mixBtn.textContent = 'Copied!';
+            
+            setTimeout(() => {
+                mixBtn.textContent = originalText;
+                statusMsg.style.opacity = '0';
+            }, 2000);
+        });
+    });
 
-    function startAlarm(id) {
-        let count = 0;
-        beep(); 
-        timers[id].alarmInt = setInterval(() => {
-            beep();
-            count++;
-            if (count > 150) stopAlarm(id); 
-        }, 200);
-    }
+    clearBtn.addEventListener('click', () => {
+        input.value = '';
+        statusMsg.style.opacity = '0';
+        input.focus();
+    });
 
-    function stopAlarm(id) {
-        const t = timers[id];
-        clearInterval(t.alarmInt);
-        t.alarmInt = null;
-        document.getElementById(`card-${id}`).classList.remove('alarm');
-        document.getElementById(`start-${id}`).textContent = 'START';
-    }
-
-    function resetTimer(id) {
-        const t = timers[id];
-        clearInterval(t.interval);
-        if (t.alarmInt) stopAlarm(id);
-        t.time = 0;
-        t.running = false;
-        updateDisplay(id);
-        document.getElementById(`start-${id}`).textContent = 'START';
-        document.getElementById(`card-${id}`).className = 'timer-card';
-    }
-
-    document.getElementById('homeBtn').onclick = () => document.getElementById('modal').style.display = 'flex';
+    document.getElementById('homeBtn').onclick = () => modal.style.display = 'flex';
+    document.getElementById('close').onclick = () => modal.style.display = 'none';
+    window.onclick = (e) => { if (e.target == modal) modal.style.display = 'none'; };
 
     async function loadFooter() {
         try {
