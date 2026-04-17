@@ -3,18 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Parallel Timer</title>
+    <title>Parallel Timer - Fridge Combo</title>
     <link rel="apple-touch-icon" href="image_21.png">
     <link rel="icon" type="image/png" href="image_21.png">
     <style>
         :root {
             --bg: #fff;
-            --main: #333; /* #333固定 */
+            --main: #333;
             --accent: #eee;
-            --radius: 12px;
+            --input-bg: #fafafa;
+            --radius: 15px;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            margin: 0; 
+            padding: 0; 
+        }
         
         body {
             background-color: var(--bg);
@@ -23,32 +29,46 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh; /* スクロール可能に */
-            /* ★変更：ノッチ（カメラ）を回避するための上部余白 */
-            padding-top: calc(env(safe-area-inset-top, 20px) + 10px); 
-            padding-left: 10px;
-            padding-right: 10px;
-            padding-bottom: env(safe-area-inset-bottom, 10px);
+            min-height: 100vh;
+            padding: calc(env(safe-area-inset-top, 20px) + 10px) 20px env(safe-area-inset-bottom, 20px);
+            -webkit-font-smoothing: antialiased;
         }
 
         .fridge-container {
             width: 100%;
-            max-width: 420px;
+            max-width: 400px;
             display: flex;
             flex-direction: column;
+            flex-grow: 1;
         }
 
-        /* Timer Card (視認性重視で余白調整) */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        h1 { font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; }
+
+        .hub-link {
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--main);
+            background: var(--accent);
+            padding: 8px 12px;
+            border-radius: 10px;
+        }
+
         .timer-card {
-            background: #fafafa;
+            background: var(--input-bg);
             border: 2px solid var(--accent);
             border-radius: var(--radius);
-            padding: 12px; /* 圧縮しすぎない */
+            padding: 15px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            /* ★変更：タイマー同士の視認性を確保する余白 */
-            margin-bottom: 12px; 
+            margin-bottom: 15px;
             transition: all 0.2s;
         }
         .timer-card.running { border-color: var(--main); background: #fff; }
@@ -65,90 +85,156 @@
             font-weight: 800;
             font-variant-numeric: tabular-nums;
             text-align: center;
-            margin-bottom: 8px; /* わずかに調整 */
+            margin-bottom: 12px;
             line-height: 1;
         }
 
-        /* Controls */
-        .adder-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
+        .adder-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
         .add-btn {
-            background: var(--accent); border: none; padding: 12px 0; /* 圧縮しすぎない */
-            border-radius: 8px; font-size: 0.8rem; font-weight: 800; color: var(--main); cursor: pointer;
+            background: var(--accent); 
+            border: none; 
+            padding: 12px 0;
+            border-radius: 10px; 
+            font-size: 0.8rem; 
+            font-weight: 800; 
+            color: var(--main); 
+            cursor: pointer;
+            -webkit-appearance: none;
         }
-        .add-btn:active { background: #ccc; }
 
-        .action-grid { display: grid; grid-template-columns: 3fr 1fr; gap: 8px; }
+        .action-grid { display: grid; grid-template-columns: 3fr 1fr; gap: 10px; }
         .main-btn {
-            background: var(--main); color: #fff; border: none; padding: 15px; /* 圧縮しすぎない */
-            border-radius: 10px; font-size: 1rem; font-weight: 800; cursor: pointer;
+            background: var(--main); 
+            color: #fff; 
+            border: none; 
+            padding: 18px;
+            border-radius: var(--radius); 
+            font-size: 1.1rem; 
+            font-weight: 800; 
+            cursor: pointer;
+            -webkit-appearance: none;
+            -webkit-text-fill-color: #fff;
+            opacity: 1 !important;
         }
         .reset-btn {
-            background: #fff; border: 2px solid var(--accent); color: #ccc;
-            padding: 15px; border-radius: 10px; font-weight: 800; cursor: pointer; font-size: 0.7rem;
+            background: #fff; 
+            border: 2px solid var(--accent); 
+            color: #ccc;
+            padding: 18px; 
+            border-radius: var(--radius); 
+            font-weight: 800; 
+            cursor: pointer; 
+            font-size: 0.75rem;
+            -webkit-appearance: none;
         }
 
-        /* Footer (タイマー優先で押し出す) */
-        .footer-btns { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 30px 0 10px; }
+        .footer-btns { 
+            margin-top: auto;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 12px; 
+            padding: 40px 0 30px; 
+        }
         .kofi-btn, .home-btn {
-            display: inline-flex; align-items: center; padding: 12px 20px;
-            border-radius: 15px; font-weight: bold; font-size: 0.85rem; text-decoration: none;
+            width: 100%;
+            max-width: 250px;
+            padding: 14px;
+            border-radius: var(--radius);
+            font-weight: 800;
+            font-size: 0.9rem;
+            text-decoration: none;
+            text-align: center;
+            border: none;
+            cursor: pointer;
         }
-        .kofi-btn { background: var(--main); color: #fff; }
-        .home-btn { background: var(--accent); color: var(--main); border: none; }
+        .kofi-btn { background: #fff; color: var(--main); border: 2px solid var(--main); }
+        .home-btn { background: var(--accent); color: var(--main); }
 
-        footer { font-size: 0.7rem; color: #bbb; text-align: center; padding-bottom: 10px; }
+        footer { 
+            font-size: 0.75rem; 
+            color: #bbb; 
+            text-align: center; 
+            padding-bottom: 20px;
+            font-weight: 600;
+            line-height: 1.6;
+        }
+        footer a { color: inherit; text-decoration: underline; }
 
-        /* Modal (固定仕様:憲法遵守・下部クローズボタン削除) */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { 
-            background: #fff; padding: 30px; border-radius: 20px; 
-            max-width: 320px; width: 90%; position: relative;
-            text-align: left;
+            background: #fff; 
+            padding: 30px; 
+            border-radius: var(--radius); 
+            width: 85%;
+            max-width: 320px; 
+            position: relative;
+            text-align: center;
         }
-        .modal-title-row { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; font-size: 1.2rem; font-weight: 800;}
-        .instruction-group { margin-bottom: 15px; font-size: 0.95rem; line-height: 1.5; color: #333; }
-        .close-icon { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; color: #aaa; cursor: pointer; padding: 5px; } /* パディング足して押しやすく */
+        .close-icon { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; color: #aaa; cursor: pointer; font-weight: bold; }
 
     </style>
 </head>
 <body>
 
 <div class="fridge-container">
-    <div class="timer-card" id="card-1">
-        <div class="display" id="display-1">00:00</div>
-        <div class="adder-grid">
-            <button class="add-btn" onclick="addTime(1, 600)">+10m</button>
-            <button class="add-btn" onclick="addTime(1, 300)">+5m</button>
-            <button class="add-btn" onclick="addTime(1, 60) ">+1m</button>
-            <button class="add-btn" onclick="addTime(1, 10) ">+10s</button>
-        </div>
-        <div class="action-grid">
-            <button class="main-btn" id="start-1" onclick="toggleTimer(1)">START</button>
-            <button class="reset-btn" onclick="resetTimer(1)">CLR</button>
-        </div>
-    </div>
+    <header>
+        <h1>Parallel Timer</h1>
+        <a href="https://afrorakda.github.io/" class="hub-link">🏠 Hub</a>
+    </header>
 
-    <div class="timer-card" id="card-2">
-        <div class="display" id="display-2">00:00</div>
-        <div class="adder-grid"><button class="add-btn" onclick="addTime(2, 600)">+10m</button><button class="add-btn" onclick="addTime(2, 300)">+5m</button><button class="add-btn" onclick="addTime(2, 60) ">+1m</button><button class="add-btn" onclick="addTime(2, 10) ">+10s</button></div>
-        <div class="action-grid"><button class="main-btn" id="start-2" onclick="toggleTimer(2)">START</button><button class="reset-btn" onclick="resetTimer(2)">CLR</button></div>
-    </div>
+    <div id="timers-container">
+        <div class="timer-card" id="card-1">
+            <div class="display" id="display-1">00:00</div>
+            <div class="adder-grid">
+                <button class="add-btn" onclick="addTime(1, 600)">+10m</button>
+                <button class="add-btn" onclick="addTime(1, 300)">+5m</button>
+                <button class="add-btn" onclick="addTime(1, 60)">+1m</button>
+                <button class="add-btn" onclick="addTime(1, 10)">+10s</button>
+            </div>
+            <div class="action-grid">
+                <button class="main-btn" id="start-1" onclick="toggleTimer(1)">START</button>
+                <button class="reset-btn" onclick="resetTimer(1)">CLR</button>
+            </div>
+        </div>
 
-    <div class="timer-card" id="card-3">
-        <div class="display" id="display-3">00:00</div>
-        <div class="adder-grid"><button class="add-btn" onclick="addTime(3, 600)">+10m</button><button class="add-btn" onclick="addTime(3, 300)">+5m</button><button class="add-btn" onclick="addTime(3, 60) ">+1m</button><button class="add-btn" onclick="addTime(3, 10) ">+10s</button></div>
-        <div class="action-grid"><button class="main-btn" id="start-3" onclick="toggleTimer(3)">START</button><button class="reset-btn" onclick="resetTimer(3)">CLR</button></div>
+        <div class="timer-card" id="card-2">
+            <div class="display" id="display-2">00:00</div>
+            <div class="adder-grid">
+                <button class="add-btn" onclick="addTime(2, 600)">+10m</button>
+                <button class="add-btn" onclick="addTime(2, 300)">+5m</button>
+                <button class="add-btn" onclick="addTime(2, 60)">+1m</button>
+                <button class="add-btn" onclick="addTime(2, 10)">+10s</button>
+            </div>
+            <div class="action-grid">
+                <button class="main-btn" id="start-2" onclick="toggleTimer(2)">START</button>
+                <button class="reset-btn" onclick="resetTimer(2)">CLR</button>
+            </div>
+        </div>
+
+        <div class="timer-card" id="card-3">
+            <div class="display" id="display-3">00:00</div>
+            <div class="adder-grid">
+                <button class="add-btn" onclick="addTime(3, 600)">+10m</button>
+                <button class="add-btn" onclick="addTime(3, 300)">+5m</button>
+                <button class="add-btn" onclick="addTime(3, 60)">+1m</button>
+                <button class="add-btn" onclick="addTime(3, 10)">+10s</button>
+            </div>
+            <div class="action-grid">
+                <button class="main-btn" id="start-3" onclick="toggleTimer(3)">START</button>
+                <button class="reset-btn" onclick="resetTimer(3)">CLR</button>
+            </div>
+        </div>
     </div>
 
     <div class="footer-btns">
-        <a href="https://ko-fi.com/afrorakda" target="_blank" class="kofi-btn">
-            🍵 Support me on Ko-fi
-        </a>
+        <a href="https://ko-fi.com/afrorakda" target="_blank" class="kofi-btn">☕️Buy me a coffee</a>
         <button class="home-btn" id="homeBtn">Add to Home Screen</button>
     </div>
 
-    <footer>
+    <footer id="dynamicFooter">
         No login / No tracking / No ads / Browser only<br>
+        <a href="https://afrorakda.com/privacy/">Privacy Policy</a><br>
         afrorakda © 2026
     </footer>
 </div>
@@ -156,23 +242,13 @@
 <div id="modal" class="modal">
     <div class="modal-content">
         <span class="close-icon" onclick="document.getElementById('modal').style.display='none'">&times;</span>
-        <div class="modal-title-row">
-            <span>📱</span>
-            <strong>Install</strong>
+        <h3 style="margin-top:0; font-weight:800">📱 Install</h3>
+        <p style="margin: 15px 0; color: #666; font-size: 0.9rem;">Add to your home screen.</p>
+        <div style="text-align: left; font-size: 0.9rem; line-height: 1.6;">
+            <p>🍏 <b>iPhone (Safari):</b><br>Share > Add to Home Screen</p><br>
+            <p>🤖 <b>Android (Chrome):</b><br>Menu (⋮) > Add to home screen</p>
         </div>
-        
-        <p style="margin-bottom: 20px; color: #666; font-size: 0.9rem;">Add to your home screen.</p>
-
-        <div class="instruction-group">
-            <p>🍏 <strong>iPhone (Safari):</strong></p>
-            <p>Tap <strong>Share</strong>, then <strong>Add to Home Screen</strong>.</p>
-        </div>
-
-        <div class="instruction-group">
-            <p>🤖 <strong>Android (Chrome):</strong></p>
-            <p>Tap <strong>Menu (⋮)</strong>, then <strong>Add to home screen</strong>.</p>
-        </div>
-        </div>
+    </div>
 </div>
 
 <script>
@@ -284,6 +360,19 @@
     }
 
     document.getElementById('homeBtn').onclick = () => document.getElementById('modal').style.display = 'flex';
+
+    async function loadFooter() {
+        try {
+            const res = await fetch('footer.json');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.footerHtml) {
+                    document.getElementById('dynamicFooter').innerHTML = data.footerHtml;
+                }
+            }
+        } catch(e) {}
+    }
+    window.onload = loadFooter;
 </script>
 
 </body>
