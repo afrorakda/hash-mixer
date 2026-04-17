@@ -18,9 +18,18 @@
             --placeholder: #bbb;
         }
 
+        /* 長押しメニュー抑制（全体） */
         * { 
             box-sizing: border-box; 
             -webkit-tap-highlight-color: transparent; 
+            -webkit-touch-callout: none;
+            user-select: none;
+        }
+
+        /* テキストエリアのみ選択・入力を許可 */
+        textarea {
+            -webkit-touch-callout: default !important;
+            user-select: text !important;
         }
 
         body {
@@ -134,8 +143,10 @@
             font-weight: 800;
             cursor: pointer;
             -webkit-appearance: none;
+            transition: background 0.2s;
         }
         .main-btn:active { transform: scale(0.98); }
+        .main-btn.active { background: #000; }
 
         .footer-btns { 
             margin-top: auto;
@@ -229,9 +240,11 @@
         const rawText = input.value.trim();
         if (!rawText) return;
 
-        // ハッシュタグを抽出（スペース、カンマ、改行で分割し、#で始まるものを特定、または全てをタグとして扱う）
-        // 連続する空白なども考慮
-        let tags = rawText.split(/[\s,]+/).filter(t => t.length > 0);
+        // ハッシュタグを抽出（スペース、カンマ、改行、全角スペース等で分割）
+        let tags = rawText.split(/[\s,、]+/).filter(t => t.length > 0);
+
+        // ハッシュ記号がない場合に自動付与するロジック
+        tags = tags.map(t => t.startsWith('#') ? t : '#' + t);
 
         // フィッシャー–イェーツのシャッフル
         for (let i = tags.length - 1; i > 0; i--) {
@@ -248,9 +261,11 @@
             
             const originalText = mixBtn.textContent;
             mixBtn.textContent = 'Copied!';
+            mixBtn.classList.add('active');
             
             setTimeout(() => {
                 mixBtn.textContent = originalText;
+                mixBtn.classList.remove('active');
                 statusMsg.style.opacity = '0';
             }, 2000);
         });
